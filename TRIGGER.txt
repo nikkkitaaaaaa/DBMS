@@ -1,0 +1,36 @@
+create table library(bno int,bname varchar2(40),author varchar2(20),allowed_days int);
+create table library_audit(bno int,old_all_days int,new_all_days int);
+create table lib_del(bno int,bname varchar2(40),author varchar2(20),allowed_days int);
+
+
+insert into library values(1,'Database Systems','S Sudarshan',10);
+insert into library values(2,'System Programming','John Donovan',20);
+insert into library values(3,'Computer Net','Douglas E. Comer',18);
+insert into library values(4,'Agile Proje','Ken Schwaber',24);
+insert into library values(5,'Python','Wes McKinney',12);
+
+
+create or replace trigger tr1
+before update of allowed_days on  library
+for each row
+begin
+insert into library_audit values(new.bno,old.allowed_days,new.allowed_days);
+dbms_output.put_line('triggered');
+dbms_output.put_line('the old value is:'||old.allowed_days);
+dbms_output.put_line('the new value is:'||new.allowed_days);
+end;
+
+
+create trigger tr2
+after delete on library
+for each row
+begin 
+insert into lib_del(old.bno,old.bname,old.author,old.allowed_days);
+dbms_output.put_line('triggered');
+dbms_output.put_line('the old value are:'||old.bno);
+dbms_output.put_line('the old value are:'||old.bname);
+dbms_output.put_line('the old value are:'||old.author);
+dbms_output.put_line('the old value are:'||old.allowed_days);
+end;
+
+

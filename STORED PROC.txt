@@ -1,0 +1,100 @@
+CREATE TABLE StudMarks(
+name VARCHAR2(30),
+total_marks NUMBER,
+PRIMARY KEY(name));
+
+
+INSERT INTO StudMarks (name, total_marks) VALUES ('Nikita', 1450);
+INSERT INTO StudMarks (name, total_marks) VALUES ('Tanny', 1320);
+INSERT INTO StudMarks (name, total_marks) VALUES ('Sayali', 980);
+INSERT INTO StudMarks (name, total_marks) VALUES ('Tanayua', 760);
+INSERT INTO StudMarks (name, total_marks) VALUES ('Aarya', 1190);
+INSERT INTO StudMarks (name, total_marks) VALUES ('Prachi', 875);
+
+
+
+CREATE TABLE Result (
+    name VARCHAR2(30),
+    roll_no NUMBER,
+    class VARCHAR2(30),
+    PRIMARY KEY(roll_no)
+);
+
+INSERT INTO Result (name, roll_no, class) VALUES ('Nikita', 1, NULL);
+INSERT INTO Result (name, roll_no, class) VALUES ('Tanny', 2, NULL);
+INSERT INTO Result (name, roll_no, class) VALUES ('Sayali', 3, NULL);
+INSERT INTO Result (name, roll_no, class) VALUES ('Tanayua', 4, NULL);
+INSERT INTO Result (name, roll_no, class) VALUES ('Aarya', 5, NULL);
+INSERT INTO Result (name, roll_no, class) VALUES ('Prachi', 6, NULL);
+
+
+CREATE OR REPLACE PROCEDURE proc_Grade(
+    R IN NUMBER,
+    grade OUT VARCHAR2
+)
+IS
+    Sname VARCHAR2(30);
+    total_marks NUMBER;
+    outofR EXCEPTION;
+BEGIN
+    SELECT name INTO Sname
+    FROM Result
+    WHERE roll_no = R;
+
+    IF Sname IS NULL THEN
+        RAISE outofR;
+    ELSE
+        SELECT total_marks INTO total_marks
+        FROM StudMarks
+        WHERE name = Sname;
+
+        IF total_marks <= 1500 AND total_marks >= 990 THEN
+            grade := 'Distinction';
+            UPDATE Result SET class = 'Distinction' WHERE roll_no = R;
+
+        ELSIF total_marks < 990 AND total_marks >= 800 THEN
+            grade := 'First Class';
+	    UPDATE Result SET class = 'First Class' WHERE roll_no = R;
+      
+        ELSIF total_marks < 800 AND total_marks >= 600 THEN
+            grade := 'Second Class';
+	    UPDATE Result SET class = 'Second Class' WHERE roll_no = R;
+         
+        ELSE
+            grade := 'No Grade';
+	    UPDATE Result SET class = 'No Grade' WHERE roll_no = R;
+            
+        END IF;
+    END IF;
+
+EXCEPTION
+    WHEN outofR THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid Roll_NO');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error occurred: ' || SQLERRM);
+END;
+/
+
+
+
+
+DECLARE
+grade VARCHAR2(30);
+Roll_no NUMBER;
+BEGIN 
+
+Roll_no:=&Roll_no;
+proc_Grade(Roll_no,grade);
+DBMS_OUTPUT.PUT_LINE('The Grade Class is: '||grade);
+
+END;
+/
+
+
+
+
+
+
+
+
+
